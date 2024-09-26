@@ -37,8 +37,8 @@ Save and Load Functionality:
 
 Installation:
 
-just download the folder and extract it to any location on your computer. No installation is required! Simply open the file named 'index.html' in your browser, and you're good to go.
-The code is desinged not to need a local envioment, can be run in the browser as is.
+Just download the folder and extract it to any location on your computer. No installation is required! Simply open the file named 'index.html' in your browser, and you're good to go. 
+The code is designed to run directly in the browser without the need for a local environment.
 
 ----------
 
