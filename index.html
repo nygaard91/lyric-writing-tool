@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lyric Writing Tool</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+    /* Highlight classes */
+    .highlight1 {
+        background-color: #ffffd3;
+    }
+    .highlight2 {
+        background-color: #dbffdb;
+    }
+
+    /* Container for the textarea and highlighted text */
+    .textarea-container {
+        position: relative;
+        height: calc(100vh - 150px); /* Adjust as needed */
+        min-height: 1130px;
+        border: 1px solid #ccc;
+        display: flex; /* Use flex to align items */
+        overflow: hidden; /* Prevent double scrollbars */
+    }
+
+    /* Shared styles for both the textarea and the highlighted text */
+    #lyric-input,
+    #highlighted-text {
+        position: absolute;
+        top: 0;
+        left: 50px; /* Adjust left position to accommodate line counts */
+        width: calc(100% - 50px); /* Adjust width accordingly */
+        height: 100%;
+        padding: 10px;
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        font-family: Arial, sans-serif; /* Use your preferred font */
+        font-size: 16px;
+        line-height: 1.2;
+        box-sizing: border-box;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        white-space: pre;       /* Change from pre-wrap to pre */
+        word-wrap: normal;      /* Disable word wrapping */
+        overflow-wrap: normal;  /* Disable overflow wrapping */
+        overflow-x: auto;       /* Enable horizontal scrolling */
+    }
+
+    /* Specific styles for the textarea */
+    #lyric-input {
+        resize: none;
+        color: transparent; /* Hide the text */
+        caret-color: black; /* Show the cursor */
+        spellcheck: false;  /* Disable spell check */
+    }
+
+    /* Specific styles for the highlighted text */
+    #highlighted-text {
+        pointer-events: none; /* Makes the div non-interactive */
+    }
+
+    /* Hide scrollbar for highlighted-text div */
+    #highlighted-text::-webkit-scrollbar {
+        display: none;
+    }
+    #highlighted-text {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;     /* Firefox */
+    }
+
+    /* Other styles */
+    .tag-cell {
+        color: black;
+        text-decoration: none;
+        min-width: 200px;
+        width: 230px;
+        font-weight: 500;
+    }
+
+    #rhymes-list {
+        height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+
+    .separator {
+        border-top: 1px solid #dee2e6;
+        margin: 1.5rem 0;
+    }
+
+    #rhymes-list ol {
+        counter-reset: item;
+    }
+    #rhymes-list ol li {
+        display: block;
+    }
+    #rhymes-list ol li:before {
+        content: counter(item) ". ";
+        counter-increment: item;
+        color: #bcbcbc;
+    }
+
+    /* Slider styling */
+    .slider-container {
+        margin-top: 10px;
+    }
+    .slider-container label {
+        font-weight: bold;
+    }
+
+    /* Blacklist highlighting */
+    .highlight-blacklist {
+        color: red;
+        /* font-weight: bold; */
+    }
+    #rhymes-list a {
+        color: #212529 !important;
+    }
+    /* Line Word Counts */
+    #line-word-counts {
+        position: relative;
+        width: 50px; /* Adjust the width as needed */
+        padding: 10px 5px 10px 0;
+        overflow: hidden;
+        text-align: right;
+        font-family: Arial, sans-serif; /* Match the textarea font */
+        font-size: 16px;
+        line-height: 1.2;
+        box-sizing: border-box;
+        border-right: 1px solid #ccc;
+        background-color: #f9f9f9;
+        color: #555;
+        white-space: pre-wrap;
+    }
+
+    #line-word-counts .line-count {
+        height: 1.2em; /* Match the line height */
+        color: #afafaf;
+    }
+
+    /* Adjust the scrollbars */
+    #lyric-input,
+    #highlighted-text {
+        scrollbar-width: none; /* Firefox */
+    }
+
+    #lyric-input::-webkit-scrollbar,
+    #highlighted-text::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for WebKit browsers */
+    }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row">
+                    <!-- First Column: Text Area -->
+                    <div class="col-md-8">
+                        <div class="textarea-container">
+                            <!-- Line Word Counts -->
+                            <div id="line-word-counts"></div>
+                            <!-- Highlighted Text -->
+                            <div id="highlighted-text"></div>
+                            <!-- Textarea Input -->
+                            <textarea id="lyric-input" placeholder="Write your lyrics here..." spellcheck="false"></textarea>
+                        </div>
+                        <!-- Word and Letter Counter -->
+                        <div id="counter" class="mt-2">
+                            Words: <span id="word-count">0</span> | Letters: <span id="letter-count">0</span>
+                        </div>
+                        <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input" id="spellcheck-toggle">
+                                <label class="form-check-label" for="spellcheck-toggle">Spell Check</label>
+                        </div>
+                    </div>
+                    <!-- Second Column: Settings -->
+                    <div class="col-md-4">
+                        <!-- Save/Load Section -->
+                        <div>
+                            <button id="save-btn" class="btn btn-primary mb-2">Save</button>
+                            <button id="load-btn" class="btn btn-secondary mb-2 ml-2">Load</button>
+                            <!-- Hidden file input -->
+                            <input type="file" id="load-input" accept=".json" style="display: none;">
+                        </div>
+                        <div class="separator"></div>
+                        <!-- Title and Prompt Inputs -->
+                        <div>
+                            <div class="form-group">
+                                <label for="title-input">Title</label>
+                                <input type="text" id="title-input" class="form-control" placeholder="Enter song title">
+                            </div>
+                            <div class="form-group">
+                                <label for="prompt-input">Prompt</label>
+                                <input type="text" id="prompt-input" class="form-control" placeholder="Enter song prompt">
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <!-- Duration and Tempo -->
+                        <div>
+                            <!-- Duration Dropdown -->
+                            <div class="form-group">
+                                <label for="duration-select">Duration</label>
+                                <select id="duration-select" class="form-control">
+                                    <option value="32">32 seconds</option>
+                                    <option value="130">130 seconds</option>
+                                </select>
+                            </div>
+                            <!-- Tempo Dropdown -->
+                            <div class="form-group">
+                                <label for="tempo-select">Tempo</label>
+                                <select id="tempo-select" class="form-control">
+                                    <option value="slow">Slow Tempo (~60 BPM)</option>
+                                    <option value="mid">Mid Tempo (~100 BPM)</option>
+                                    <option value="fast">Fast Tempo (~140 BPM)</option>
+                                </select>
+                            </div>
+                            <!-- Prompt/Genre Suggestions -->
+                            <div id="suggestions" class="mt-3">
+                                <!-- Suggestions will be inserted here -->
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <!-- Cheat-sheet Button -->
+                        <div>
+                            <button id="cheat-sheet-btn" class="btn btn-info mb-3">Cheat-sheet</button>
+                            <!-- Cheat Sheet Modal -->
+                            <div class="modal fade" id="cheatSheetModal" tabindex="-1" role="dialog" aria-labelledby="cheatSheetModalLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-xl" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="cheatSheetModalLabel">Cheat-sheet</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <br>
+                                    <h3>Structural Sections</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="tag-cell">[Verse]</td>
+                                                <td>A section of the song where the narrative or theme is developed. Typically, each verse has different lyrics but the same melody.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Verse: Male Vocalist]</td>
+                                                <td>Specifies that the verse should be sung by a male vocalist. (Not always honored)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Verse: Female Vocalist]</td>
+                                                <td>Specifies that the verse should be sung by a female vocalist. (Not always honored)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Chorus]</td>
+                                                <td>The main, often repeated, section of the song that contains the core message or hook. It’s usually the most memorable part.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Intro]</td>
+                                                <td>The opening part of the song, which sets the tone and may include music, vocals, or both.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Outro]</td>
+                                                <td>The closing section of the song, which brings the song to a conclusion. It can be instrumental or lyrical.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Bridge]</td>
+                                                <td>A contrasting section that often provides a break from the repetitive structure of verses and choruses. It offers new musical or lyrical ideas, usually leading into the final chorus.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-Chorus]</td>
+                                                <td>A transitional section that leads into the chorus, building anticipation.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Post-Chorus]</td>
+                                                <td>A section that comes right after the chorus and adds a new layer or continuation of the energy from the chorus.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Final Chorus]</td>
+                                                <td>The last iteration of the chorus, often with added intensity or slight variations to emphasize the conclusion of the song.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Build-Up]</td>
+                                                <td>Similar to the [Pre-Chorus], but not necessarily leading into a chorus. It gradually increases intensity, setting up any major transition in the song.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Hook]</td>
+                                                <td>A catchy phrase or musical idea, often part of the chorus, that grabs the listener’s attention.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Refrain]</td>
+                                                <td>A short, repeating phrase or line, often at the end of each verse or section.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-Hook]</td>
+                                                <td>A section leading into the hook, building tension or anticipation.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Drop]</td>
+                                                <td>A climactic moment, often in electronic music, where the music builds up and then "drops" into a powerful or rhythm-heavy section.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Breakdown]</td>
+                                                <td>A section where the instrumentation or energy is reduced, often to build tension before a subsequent section.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Break]</td>
+                                                <td>A moment of pause or a brief instrumental section that interrupts the flow.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <br>
+                                    <h3>Repeated Sections</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="tag-cell">[Verse Repeat]</td>
+                                                <td>A repeated verse, usually with the same melody and lyrics as an earlier verse.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Chorus Repeat]</td>
+                                                <td>The chorus being repeated after another section.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Interlude]</td>
+                                                <td>A short, usually instrumental, section that provides a break between verses or other sections.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-Drop]</td>
+                                                <td>A build-up section just before the drop in electronic or dance music.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-Refrain]</td>
+                                                <td>A section that leads directly into the refrain.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <br>
+                                    <h3>Instrumental Elements</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental]</td>
+                                                <td>A section with no vocals, allowing the focus to shift to the instruments.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental Break]</td>
+                                                <td>A brief instrumental section, providing a pause in the lyrics.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental Bridge]</td>
+                                                <td>An instrumental version of a bridge, typically leading into a chorus or outro.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental Outro]</td>
+                                                <td>A closing section with only instruments, no vocals.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Solo]</td>
+                                                <td>A section where one instrument takes the spotlight, often in the form of a guitar solo or piano solo.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Build]</td>
+                                                <td>A section where the intensity or volume gradually increases, building up energy.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Sample]</td>
+                                                <td>A portion of sound or music borrowed from another recording.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Ensemble]</td>
+                                                <td>A section where multiple instruments or voices come together to create a fuller sound.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <br>
+                                    <h3>Vocals and Spoken Elements</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="tag-cell">[Voiceover]</td>
+                                                <td>A spoken part added over the instrumental or vocal sections.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Spoken]</td>
+                                                <td>Lyrics delivered as spoken word rather than sung.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Spoken Word]</td>
+                                                <td>A form of vocal delivery where the lyrics are spoken instead of sung, often used for dramatic or poetic effect.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Choir]</td>
+                                                <td>A group of singers performing together, usually harmonizing in multiple parts.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Announcer]</td>
+                                                <td>A voice that introduces or announces sections or elements within a song.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                     
+                                    <br>
+                                    <h3>Miscellaneous</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="tag-cell">[Hook Repeat]</td>
+                                                <td>Repetition of the hook, often found in the chorus or refrain.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Post-Hook]</td>
+                                                <td>A section following the hook, usually complementing it or reinforcing the song’s central theme.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Couplet]</td>
+                                                <td>Two lines of lyrics that typically rhyme and form a unit in a verse.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[All]</td>
+                                                <td>A section where all voices or instruments play together.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Breakdown]</td>
+                                                <td>A part of the song where the musical arrangement is simplified or reduced, usually to build intensity or allow space for the next section.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Ensemble]</td>
+                                                <td>Refers to a group of musicians or singers performing together.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-Break]</td>
+                                                <td>A section that precedes a break in the song, often building tension.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Emotional]</td>
+                                                <td>Used to indicate when the singer should deliver a heightened emotional performance, often by intensifying or emphasizing the last word of a line, like a scream or powerful vocal push.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">(lyrics in parentheses)</td>
+                                                <td>Use parentheses to indicate lyrics sung in a different manner, including words or sounds (e.g., “ooohhh”).</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+     
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <!-- Rhyme Finder -->
+                        <div>
+                            <div class="form-group">
+                                <label for="rhyme-input">Find Rhymes</label>
+                                <input type="text" id="rhyme-input" class="form-control" placeholder="Enter a word">
+                                <label for="ending-select" class="mt-2">Match ending letters:</label>
+                                <select id="ending-select" class="form-control">
+                                    <option value="2">2 letters</option>
+                                    <option value="3" selected>3 letters</option>
+                                    <option value="4">4 letters</option>
+                                    <option value="5">5 letters</option>
+                                </select>
+                                <button id="rhyme-btn" class="btn btn-secondary mt-2">Search</button>
+                                <div class="slider-container">
+                                    <label for="length-slider">Max Word Length: <span id="slider-value">0</span></label>
+                                    <input type="range" id="length-slider" class="form-control-range" min="1" max="1" value="1" disabled>
+                                </div>
+                                <div id="rhymes-list" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End of row -->
+            </div>
+        </div>
+    </div>
+    <!-- Include jQuery and Bootstrap JS for modal functionality -->
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    
+    <!-- Include the word list script -->
+    <script src="wordlist.js"></script>
+
+    <!-- Include the blacklist script -->
+    <script src="blacklist.js"></script>
+
+    <!-- JavaScript Code -->
+    <script>
+        $(document).ready(function() {
+            // Handle Cheat-sheet Modal
+            $('#cheat-sheet-btn').click(function() {
+                $('#cheatSheetModal').modal('show');
+            });
+
+            // Spell Check Toggle
+            $('#spellcheck-toggle').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#lyric-input').attr('spellcheck', 'true');
+                } else {
+                    $('#lyric-input').attr('spellcheck', 'false');
+                }
+            });
+
+            // Initialize spellcheck attribute based on the checkbox state
+            $('#lyric-input').attr('spellcheck', 'false'); // Default is off
+
+            // Generate suggestions based on tempo
+            function updateSuggestions() {
+                var tempo = $('#tempo-select').val();
+                var suggestions = '';
+                if (tempo === 'slow') {
+                    suggestions = '<p>Prompt suggestions: Tempo 60 BPM, Ballads, Blues, Lo-Fi Hip-Hop, Downtempo, soulful melodies, emotional or introspective lyrics.</p>';
+                } else if (tempo === 'mid') {
+                    suggestions = '<p>Prompt suggestions: Tempo 100 BPM, Pop, Hip-Hop, Reggaeton, R&B, Funk, groovy rhythms, catchy hooks, storytelling, uplifting or reflective messages.</p>';
+                } else if (tempo === 'fast') {
+                    suggestions = '<p>Prompt suggestions: Tempo 140 BPM, Rap, EDM, Drum and Bass, Punk Rock, Techno, fast-paced beats, energetic melodies, dance vibes, high-energy anthems.</p>';
+                }
+                $('#suggestions').html(suggestions);
+            }
+
+            function updateLineWordCounts() {
+                var text = $('#lyric-input').val();
+                var lines = text.split('\n');
+                var lineCountsHtml = '';
+                var totalLines = lines.length;
+
+                for (var i = 0; i < totalLines; i++) {
+                    var line = lines[i];
+                    // Remove content within [] and ()
+                    var lineWithoutBrackets = line.replace(/\[[^\]]*\]|\([^\)]*\)/g, '').trim();
+
+                    // Split the line into words
+                    var wordsInLine = lineWithoutBrackets.split(/\s+/).filter(function(word) {
+                        return word.length > 0;
+                    }).length;
+
+                    // If wordsInLine is zero, display an empty string
+                    var displayCount = wordsInLine > 0 ? wordsInLine : '';
+
+                    lineCountsHtml += '<span class="line-count">' + displayCount + '</span>\n';
+                }
+
+                $('#line-word-counts').html(lineCountsHtml);
+            }
+
+            // Synchronize scroll positions
+            function synchronizeScroll() {
+                var scrollTop = $('#lyric-input').scrollTop();
+                $('#highlighted-text').scrollTop(scrollTop);
+                $('#line-word-counts').scrollTop(scrollTop);
+            }
+
+            // Event listeners
+            $('#lyric-input').on('input', function() {
+                updateHighlighting();
+                updateCounters();
+                updateLineWordCounts();
+            });
+
+            $('#lyric-input').on('scroll', function() {
+                synchronizeScroll();
+            });
+
+
+            // Synchronize scroll between textarea and highlighted text
+            $('#lyric-input').on('scroll', function() {
+                $('#highlighted-text').scrollTop($(this).scrollTop());
+                $('#highlighted-text').scrollLeft($(this).scrollLeft());
+            });
+
+            // Calculate word chunks based on duration and tempo
+            function updateHighlighting() {
+                var duration = $('#duration-select').val();
+                var tempo = $('#tempo-select').val();
+                var wordsPerChunk = 0;
+
+                if (tempo === 'slow') {
+                    wordsPerChunk = (duration == '32') ? 30 : 120;
+                } else if (tempo === 'mid') {
+                    wordsPerChunk = (duration == '32') ? 75 : 300;
+                } else if (tempo === 'fast') {
+                    wordsPerChunk = (duration == '32') ? 140 : 560;
+                }
+
+                var text = $('#lyric-input').val();
+                var words = text.split(/(\s+)/); // Split including whitespace
+                var displayText = '';
+                var chunkCount = 0;
+                var wordCount = 0;
+                var inTag = false;
+
+                for (var i = 0; i < words.length; i++) {
+                    var word = words[i];
+
+                    // Check if it's whitespace
+                    if (/^\s+$/.test(word)) {
+                        displayText += word;
+                        continue;
+                    }
+
+                    // Check for tags and set inTag flag
+                    if (word.startsWith('[') || word.startsWith('(')) {
+                        inTag = true;
+                    }
+
+                    if (inTag) {
+                        displayText += word;
+                    } else {
+                        if (word.trim().length > 0) {
+                            wordCount++;
+                            if (wordCount > wordsPerChunk) {
+                                chunkCount++;
+                                wordCount = 1;
+                            }
+                            var highlightClass = (chunkCount % 2 == 0) ? 'highlight1' : 'highlight2';
+
+                            // Check if the word is in the blacklist
+                            var cleanedWord = word.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "").toLowerCase();
+                            if (blacklist.includes(cleanedWord)) {
+                                highlightClass += ' highlight-blacklist';
+                            }
+
+                            displayText += '<span class="' + highlightClass + '">' + word + '</span>';
+                        } else {
+                            displayText += word;
+                        }
+                    }
+
+                    if (word.endsWith(']') || word.endsWith(')')) {
+                        inTag = false;
+                    }
+                }
+
+                $('#highlighted-text').html(displayText);
+            }
+
+            // Update word and letter counters
+            function updateCounters() {
+                var text = $('#lyric-input').val();
+                var words = text.split(/(\s+)/); // Split including whitespace
+                var wordCount = 0;
+                var letterCount = 0;
+                var inTag = false;
+
+                for (var i = 0; i < words.length; i++) {
+                    var word = words[i];
+
+                    // Check if it's whitespace
+                    if (/^\s+$/.test(word)) {
+                        continue;
+                    }
+
+                    // Check for tags and set inTag flag
+                    if (word.startsWith('[') || word.startsWith('(')) {
+                        inTag = true;
+                    }
+
+                    if (!inTag) {
+                        if (word.trim().length > 0) {
+                            wordCount++;
+                            letterCount += word.length;
+                        }
+                    }
+
+                    if (word.endsWith(']') || word.endsWith(')')) {
+                        inTag = false;
+                    }
+                }
+
+                $('#word-count').text(wordCount);
+                $('#letter-count').text(letterCount);
+            }
+
+            // Event listeners
+            $('#tempo-select, #duration-select').change(function() {
+                updateSuggestions();
+                updateHighlighting();
+            });
+
+            $('#lyric-input').on('input', function() {
+                updateHighlighting();
+                updateCounters();
+            });
+
+            // Initialize
+            updateSuggestions();
+            updateHighlighting();
+            updateCounters();
+            updateLineWordCounts();
+
+            // Save Button Functionality
+            $('#save-btn').click(function() {
+                var title = $('#title-input').val();
+                var prompt = $('#prompt-input').val();
+                var lyrics = $('#lyric-input').val();
+                var duration = $('#duration-select').val();
+                var tempo = $('#tempo-select').val();
+
+                if (title.trim() === '') {
+                    alert('Please enter a title before saving.');
+                    return;
+                }
+
+                // Get current date/time in US format
+                var now = new Date();
+                var options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit', 
+                    hour12: true 
+                };
+                var formattedDate = now.toLocaleString('en-US', options);
+                
+                // Add the timestamp to the data
+                var data = {
+                    title: title,
+                    prompt: prompt,
+                    lyrics: lyrics,
+                    duration: duration,
+                    tempo: tempo,
+                    timestamp: formattedDate // Add the date/time to the JSON data
+                };
+
+                var dataStr = JSON.stringify(data, null, 2);
+                var blob = new Blob([dataStr], { type: "application/json" });
+                var url = URL.createObjectURL(blob);
+
+                // Append the formatted date to the file name
+                var formattedDateForFileName = now.toISOString().slice(0, 19).replace(/[:T]/g, '-'); // yyyy-mm-dd-hh-mm-ss
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = title.replace(/\s+/g, '_') + '_' + formattedDateForFileName + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+
+            // Load Button Functionality
+            $('#load-btn').click(function() {
+                $('#load-input').click();
+            });
+
+            // Load Functionality
+            $('#load-input').change(function(event) {
+                var file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        var data = JSON.parse(e.target.result);
+                        $('#title-input').val(data.title || '');
+                        $('#prompt-input').val(data.prompt || '');
+                        $('#lyric-input').val(data.lyrics || '');
+                        $('#duration-select').val(data.duration || '32');
+                        $('#tempo-select').val(data.tempo || 'slow');
+
+                        updateSuggestions();
+                        updateHighlighting();
+                        updateCounters();
+                        updateLineWordCounts();
+                    } catch (err) {
+                        alert('Invalid file format.');
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Rhyme Finder Functionality
+             var currentRhymes = []; // Store current rhymes for filtering
+
+            function loadWordList(callback) {
+                if (wordListLoaded) {
+                    callback();
+                    return;
+                }
+                $.ajax({
+                    url: 'words.txt', // Path to your words.txt file
+                    dataType: 'text',
+                    success: function(data) {
+                        wordList = data.split(/\r?\n/);
+                        wordListLoaded = true;
+                        callback();
+                    },
+                    error: function() {
+                        alert('Failed to load word list.');
+                    }
+                });
+            }
+
+            function displayRhymes(rhymes, maxLength) {
+                var filteredRhymes = rhymes.filter(function(word) {
+                    return word.length <= maxLength;
+                });
+
+                if (filteredRhymes.length === 0) {
+                    $('#rhymes-list').html('<p>No rhymes found.</p>');
+                } else {
+                    var rhymesHtml = '<ol>';
+                    filteredRhymes.forEach(function(word) {
+                        var link = 'https://www.oed.com/search/dictionary/?scope=Entries&q=' + encodeURIComponent(word);
+                        rhymesHtml += '<li><a href="' + link + '" target="_blank">' + word + '</a></li>';
+                    });
+                    rhymesHtml += '</ol>';
+                    $('#rhymes-list').html(rhymesHtml);
+                }
+            }
+
+            $('#rhyme-btn').click(function() {
+                var inputWord = $('#rhyme-input').val().trim().toLowerCase();
+                if (inputWord.length < 2) {
+                    $('#rhymes-list').html('<p>Please enter a word with at least 2 letters.</p>');
+                    return;
+                }
+
+                var endingLength = parseInt($('#ending-select').val());
+                if (inputWord.length < endingLength) {
+                    $('#rhymes-list').html('<p>The word is shorter than the selected ending length.</p>');
+                    return;
+                }
+
+                var ending = inputWord.slice(-endingLength); // Get last N letters
+                currentRhymes = wordList.filter(function(word) {
+                    return word.endsWith(ending) && word !== inputWord;
+                });
+
+                if (currentRhymes.length === 0) {
+                    $('#rhymes-list').html('<p>No rhymes found.</p>');
+                    $('#length-slider').prop('disabled', true);
+                    $('#slider-value').text('0');
+                    $('#length-slider').val(1);
+                } else {
+                    // Get the length of the longest word
+                    var maxWordLength = Math.max.apply(null, currentRhymes.map(function(word) {
+                        return word.length;
+                    }));
+
+                    // Set up the slider
+                    $('#length-slider').attr('min', 1);
+                    $('#length-slider').attr('max', maxWordLength);
+                    $('#length-slider').val(maxWordLength);
+                    $('#length-slider').prop('disabled', false);
+                    $('#slider-value').text(maxWordLength);
+
+                    // Display rhymes
+                    displayRhymes(currentRhymes, maxWordLength);
+                }
+            });
+
+
+            // Slider event listener
+            $('#length-slider').on('input change', function() {
+                var maxLength = parseInt($(this).val());
+                $('#slider-value').text(maxLength);
+                displayRhymes(currentRhymes, maxLength);
+            });
+
+        });
+    </script>
+</body>
+</html>
