@@ -34,10 +34,7 @@
         height: 100%;
         padding: 10px;
         overflow-y: auto;
-        overflow-x: auto;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+        overflow-x: auto;  
         font-family: Arial, sans-serif; /* Use your preferred font */
         font-size: 16px;
         line-height: 1.2;
@@ -154,6 +151,50 @@
     #highlighted-text::-webkit-scrollbar {
         display: none; /* Hide scrollbar for WebKit browsers */
     }
+
+    /* Adjusted styles for the tag popup */
+    #tag-popup {
+        max-width: 550px;
+        width: 430px;
+        max-height: 408px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Make the popup header sticky */
+    #tag-popup .card-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: white;
+    }
+
+    /* Custom styles for hover and active states */
+    .list-group-item-action:hover {
+        background-color: #f5f5f5;
+    }
+
+    .list-group-item.tag-active {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Ensure the tag popup header is not overlapped */
+    #tag-popup {
+        overflow: hidden;
+    }
+
+    #tag-popup .list-group {
+        max-height: 350px; /* Adjust as needed */
+        overflow-y: auto;
+    }
+
+    #tag-popup .card-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: white;
+    }
     </style>
 </head>
 <body class="bg-light">
@@ -171,13 +212,27 @@
                             <!-- Textarea Input -->
                             <textarea id="lyric-input" placeholder="Write your lyrics here..." spellcheck="false"></textarea>
                         </div>
-                        <!-- Word and Letter Counter -->
-                        <div id="counter" class="mt-2">
-                            Words: <span id="word-count">0</span> | Letters: <span id="letter-count">0</span>
+
+                        <!-- Tag Selection Popup -->
+                        <div id="tag-popup" class="card" style="display:none; position:absolute; z-index:1000;">
+                            <!--<div class="card-header py-2 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Tags</h5>
+                                <button type="button" id="tag-popup-close" class="close">&times;</button>
+                            </div>-->
+                            <ul id="tag-list" class="list-group list-group-flush">
+                                <!-- Tag items will be added here -->
+                            </ul>
                         </div>
-                        <div class="form-check mt-2">
-                                <input type="checkbox" class="form-check-input" id="spellcheck-toggle">
-                                <label class="form-check-label" for="spellcheck-toggle">Spell Check</label>
+
+                        <!-- Word and Letter Counter + Spell check-->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                          <div id="counter">
+                            Words: <span id="word-count">0</span> | Letters: <span id="letter-count">0</span>
+                          </div>
+                          <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="spellcheck-toggle">
+                            <label class="form-check-label" for="spellcheck-toggle">Spell Check</label>
+                          </div>
                         </div>
                     </div>
                     <!-- Second Column: Settings -->
@@ -241,8 +296,8 @@
                                     </button>
                                   </div>
                                   <div class="modal-body">
-                                    <br>
-                                    <h3>Structural Sections</h3>
+        
+                                    <h3>Official tags</h3>
                                     <table class="table">
                                         <thead>
                                             <tr>
@@ -253,8 +308,130 @@
                                         <tbody>
                                             <tr>
                                                 <td class="tag-cell">[Verse]</td>
-                                                <td>A section of the song where the narrative or theme is developed. Typically, each verse has different lyrics but the same melody.</td>
+                                                <td>Main narrative section of a song.</td>
                                             </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Chorus]</td>
+                                                <td>Repetitive, catchy section that often contains the song's hook</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Intro]</td>
+                                                <td>Opening section that sets the tone of the song</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Outro]</td>
+                                                <td>Closing section that brings the song to an end</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Bridge]</td>
+                                                <td>Contrasting section that connects two main parts of a song</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Hook]</td>
+                                                <td>Catchy phrase or riff designed to grab the listener's attention</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-chorus]</td>
+                                                <td>Section that builds tension before the chorus</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Refrain]</td>
+                                                <td>Repeated lyrical phrase or musical idea</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Post-chorus]</td>
+                                                <td>Section that follows and extends the chorus</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Drop]</td>
+                                                <td>Moment of musical climax, often in electronic dance music</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Interlude]</td>
+                                                <td>Instrumental passage between other sections</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental Break]</td>
+                                                <td>Section without vocals, showcasing instruments</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental]</td>
+                                                <td>Piece or section of music without vocals</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Build]</td>
+                                                <td>Gradual increase in intensity or complexity</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-hook]</td>
+                                                <td>Section that leads into the hook</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-drop]</td>
+                                                <td>Build-up section before the drop in electronic music</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Pre-refrain]</td>
+                                                <td>Section leading into the refrain</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Break]</td>
+                                                <td>Brief pause or change in the rhythm or melody</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[All]</td>
+                                                <td>Indicates all instruments or voices playing together</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Breakdown]</td>
+                                                <td>Stripped-down section that contrasts with fuller sections</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Instrumental Bridge]</td>
+                                                <td>Bridge section without vocals</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Sample]</td>
+                                                <td>Use of a portion of another sound recording</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Solo]</td>
+                                                <td>Section featuring a single instrument or voice</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Ensemble]</td>
+                                                <td>Section featuring multiple instruments or voices together</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Post-hook]</td>
+                                                <td>Section that follows and extends the hook</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Spoken Word]</td>
+                                                <td>Poetic or prose section that is spoken rather than sung</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Choir]</td>
+                                                <td>Section featuring a group of singers</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="tag-cell">[Announcer]</td>
+                                                <td>Spoken introduction or commentary, often in live recordings</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <br>
+
+                                    <h3>Community tags</h3>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag</th>
+                                                <th>Explanation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             <tr>
                                                 <td class="tag-cell">[Verse: Male Vocalist]</td>
                                                 <td>Specifies that the verse should be sung by a male vocalist. (Not always honored)</td>
@@ -262,30 +439,6 @@
                                             <tr>
                                                 <td class="tag-cell">[Verse: Female Vocalist]</td>
                                                 <td>Specifies that the verse should be sung by a female vocalist. (Not always honored)</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Chorus]</td>
-                                                <td>The main, often repeated, section of the song that contains the core message or hook. It’s usually the most memorable part.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Intro]</td>
-                                                <td>The opening part of the song, which sets the tone and may include music, vocals, or both.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Outro]</td>
-                                                <td>The closing section of the song, which brings the song to a conclusion. It can be instrumental or lyrical.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Bridge]</td>
-                                                <td>A contrasting section that often provides a break from the repetitive structure of verses and choruses. It offers new musical or lyrical ideas, usually leading into the final chorus.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Pre-Chorus]</td>
-                                                <td>A transitional section that leads into the chorus, building anticipation.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Post-Chorus]</td>
-                                                <td>A section that comes right after the chorus and adds a new layer or continuation of the energy from the chorus.</td>
                                             </tr>
                                             <tr>
                                                 <td class="tag-cell">[Final Chorus]</td>
@@ -296,42 +449,9 @@
                                                 <td>Similar to the [Pre-Chorus], but not necessarily leading into a chorus. It gradually increases intensity, setting up any major transition in the song.</td>
                                             </tr>
                                             <tr>
-                                                <td class="tag-cell">[Hook]</td>
-                                                <td>A catchy phrase or musical idea, often part of the chorus, that grabs the listener’s attention.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Refrain]</td>
-                                                <td>A short, repeating phrase or line, often at the end of each verse or section.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Pre-Hook]</td>
-                                                <td>A section leading into the hook, building tension or anticipation.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Drop]</td>
-                                                <td>A climactic moment, often in electronic music, where the music builds up and then "drops" into a powerful or rhythm-heavy section.</td>
-                                            </tr>
-                                            <tr>
                                                 <td class="tag-cell">[Breakdown]</td>
                                                 <td>A section where the instrumentation or energy is reduced, often to build tension before a subsequent section.</td>
                                             </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Break]</td>
-                                                <td>A moment of pause or a brief instrumental section that interrupts the flow.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <br>
-                                    <h3>Repeated Sections</h3>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tag</th>
-                                                <th>Explanation</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
                                             <tr>
                                                 <td class="tag-cell">[Verse Repeat]</td>
                                                 <td>A repeated verse, usually with the same melody and lyrics as an earlier verse.</td>
@@ -341,75 +461,9 @@
                                                 <td>The chorus being repeated after another section.</td>
                                             </tr>
                                             <tr>
-                                                <td class="tag-cell">[Interlude]</td>
-                                                <td>A short, usually instrumental, section that provides a break between verses or other sections.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Pre-Drop]</td>
-                                                <td>A build-up section just before the drop in electronic or dance music.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Pre-Refrain]</td>
-                                                <td>A section that leads directly into the refrain.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <br>
-                                    <h3>Instrumental Elements</h3>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tag</th>
-                                                <th>Explanation</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="tag-cell">[Instrumental]</td>
-                                                <td>A section with no vocals, allowing the focus to shift to the instruments.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Instrumental Break]</td>
-                                                <td>A brief instrumental section, providing a pause in the lyrics.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Instrumental Bridge]</td>
-                                                <td>An instrumental version of a bridge, typically leading into a chorus or outro.</td>
-                                            </tr>
-                                            <tr>
                                                 <td class="tag-cell">[Instrumental Outro]</td>
                                                 <td>A closing section with only instruments, no vocals.</td>
                                             </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Solo]</td>
-                                                <td>A section where one instrument takes the spotlight, often in the form of a guitar solo or piano solo.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Build]</td>
-                                                <td>A section where the intensity or volume gradually increases, building up energy.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Sample]</td>
-                                                <td>A portion of sound or music borrowed from another recording.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Ensemble]</td>
-                                                <td>A section where multiple instruments or voices come together to create a fuller sound.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <br>
-                                    <h3>Vocals and Spoken Elements</h3>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tag</th>
-                                                <th>Explanation</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
                                             <tr>
                                                 <td class="tag-cell">[Voiceover]</td>
                                                 <td>A spoken part added over the instrumental or vocal sections.</td>
@@ -419,53 +473,12 @@
                                                 <td>Lyrics delivered as spoken word rather than sung.</td>
                                             </tr>
                                             <tr>
-                                                <td class="tag-cell">[Spoken Word]</td>
-                                                <td>A form of vocal delivery where the lyrics are spoken instead of sung, often used for dramatic or poetic effect.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Choir]</td>
-                                                <td>A group of singers performing together, usually harmonizing in multiple parts.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Announcer]</td>
-                                                <td>A voice that introduces or announces sections or elements within a song.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                     
-                                    <br>
-                                    <h3>Miscellaneous</h3>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tag</th>
-                                                <th>Explanation</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
                                                 <td class="tag-cell">[Hook Repeat]</td>
                                                 <td>Repetition of the hook, often found in the chorus or refrain.</td>
                                             </tr>
                                             <tr>
-                                                <td class="tag-cell">[Post-Hook]</td>
-                                                <td>A section following the hook, usually complementing it or reinforcing the song’s central theme.</td>
-                                            </tr>
-                                            <tr>
                                                 <td class="tag-cell">[Couplet]</td>
                                                 <td>Two lines of lyrics that typically rhyme and form a unit in a verse.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[All]</td>
-                                                <td>A section where all voices or instruments play together.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Breakdown]</td>
-                                                <td>A part of the song where the musical arrangement is simplified or reduced, usually to build intensity or allow space for the next section.</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="tag-cell">[Ensemble]</td>
-                                                <td>Refers to a group of musicians or singers performing together.</td>
                                             </tr>
                                             <tr>
                                                 <td class="tag-cell">[Pre-Break]</td>
@@ -481,6 +494,29 @@
                                             </tr>
                                         </tbody>
                                     </table>
+
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Example Button -->
+                            <button style="display:none;" id="example-btn" class="btn btn-info mb-3">Example</button>
+                            <!-- Example Modal -->
+                            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-xl" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleLabel">Example Song</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <p>Example</p>
      
                                   </div>
                                   <div class="modal-footer">
@@ -490,6 +526,7 @@
                               </div>
                             </div>
                         </div>
+
                         <div class="separator"></div>
                         <!-- Rhyme Finder -->
                         <div>
@@ -530,9 +567,225 @@
     <!-- JavaScript Code -->
     <script>
         $(document).ready(function() {
+
+            var tagOptions = [
+                { tag: '[Verse]', description: 'Main narrative section of a song' },
+                { tag: '[Chorus]', description: 'Repetitive, catchy section that often contains the song\'s hook' },
+                { tag: '[Intro]', description: 'Opening section that sets the tone of the song' },
+                { tag: '[Outro]', description: 'Closing section that brings the song to an end' },
+                { tag: '[Bridge]', description: 'Contrasting section that connects two main parts of a song' },
+                { tag: '[Hook]', description: 'Catchy phrase or riff designed to grab the listener\'s attention' },
+                { tag: '[Pre-chorus]', description: 'Section that builds tension before the chorus' },
+                { tag: '[Refrain]', description: 'Repeated lyrical phrase or musical idea' },
+                { tag: '[Post-chorus]', description: 'Section that follows and extends the chorus' },
+                { tag: '[Drop]', description: 'Moment of musical climax, often in electronic dance music' },
+                { tag: '[Interlude]', description: 'Instrumental passage between other sections' },
+                { tag: '[Instrumental Break]', description: 'Section without vocals, showcasing instruments' },
+                { tag: '[Instrumental]', description: 'Piece or section of music without vocals' },
+                { tag: '[Build]', description: 'Gradual increase in intensity or complexity' },
+                { tag: '[Pre-hook]', description: 'Section that leads into the hook' },
+                { tag: '[Pre-drop]', description: 'Build-up section before the drop in electronic music' },
+                { tag: '[Pre-refrain]', description: 'Section leading into the refrain' },
+                { tag: '[Break]', description: 'Brief pause or change in the rhythm or melody' },
+                { tag: '[All]', description: 'Indicates all instruments or voices playing together' },
+                { tag: '[Breakdown]', description: 'Stripped-down section that contrasts with fuller sections' },
+                { tag: '[Instrumental Bridge]', description: 'Bridge section without vocals' },
+                { tag: '[Sample]', description: 'Use of a portion of another sound recording' },
+                { tag: '[Solo]', description: 'Section featuring a single instrument or voice' },
+                { tag: '[Ensemble]', description: 'Section featuring multiple instruments or voices together' },
+                { tag: '[Post-hook]', description: 'Section that follows and extends the hook' },
+                { tag: '[Spoken Word]', description: 'Poetic or prose section that is spoken rather than sung' },
+                { tag: '[Choir]', description: 'Section featuring a group of singers' },
+                { tag: '[Announcer]', description: 'Spoken introduction or commentary, often in live recordings' }
+            ];
+
+
+            var selectedTagIndex = -1;
+            var insertPosition = -1; // Position where '/' was typed
+
+            // Event listener for keyup on '#lyric-input'
+            $('#lyric-input').on('keyup', function(event) {
+                // Ignore keys that shouldn't trigger the popup refresh
+                if (['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(event.key)) {
+                    return;
+                }
+                var textarea = $(this)[0];
+                var position = textarea.selectionStart;
+                var text = textarea.value;
+                // Check if the character before the cursor is '/'
+                if (text.substring(position - 1, position) === '/') {
+                    showTagPopup(position - 1);
+                } else {
+                    hideTagPopup();
+                }
+            });
+
+            // Close button for the tag popup
+            $('#tag-popup-close').on('click', function() {
+                hideTagPopup();
+            });
+
+             // Function to show the tag selection popup
+            function showTagPopup(position) {
+                // Only populate the tag list if it's not already populated
+                if ($('#tag-list').children().length === 0) {
+                    // Populate the tag list
+                    var $tagList = $('#tag-list');
+                    $tagList.empty();
+                    tagOptions.forEach(function(option, index) {
+                        var $item = $('<li class="list-group-item list-group-item-action"></li>');
+                        $item.html('<strong>' + option.tag + '</strong><br><small>' + option.description + '</small>');
+                        $item.on('click', function() {
+                            insertTagAtPosition(option.tag, position);
+                            hideTagPopup();
+                        });
+                        $item.on('mouseenter', function() {
+                            // Update selectedTagIndex
+                            selectedTagIndex = index;
+                            updateTagSelection();
+                        });
+                        $tagList.append($item);
+                    });
+                }
+
+                selectedTagIndex = selectedTagIndex >= 0 ? selectedTagIndex : 0; // Initialize selected index
+                updateTagSelection(); // Update the highlighting
+                insertPosition = position; // Store the position for later use
+
+                // Position the tag-popup
+                var $textarea = $('#lyric-input');
+                var offset = $textarea.offset();
+                var textareaHeight = $textarea.outerHeight();
+                var textareaWidth = $textarea.outerWidth();
+
+                // Compute line number
+                var textareaElem = $textarea[0];
+                var textUpToPosition = textareaElem.value.substring(0, position + 1); // Include the '/'
+                var lines = textUpToPosition.split('\n');
+                var lineNumber = lines.length - 1;
+
+                // Compute line height
+                var lineHeight = parseInt($textarea.css('line-height'));
+                if (isNaN(lineHeight)) {
+                    var fontSize = parseInt($textarea.css('font-size'));
+                    var lineHeightMultiplier = parseFloat($textarea.css('line-height'));
+                    if (isNaN(lineHeightMultiplier)) {
+                        lineHeightMultiplier = 1.2; // Default line height
+                    }
+                    lineHeight = fontSize * lineHeightMultiplier;
+                }
+
+                // Adjust for padding
+                var paddingTop = parseInt($textarea.css('padding-top'));
+
+                // Compute the top position
+                var topPosition = paddingTop + (lineNumber * lineHeight) - $textarea.scrollTop();
+
+                // Adjust left position to align with the left edge of the textarea
+                //var leftPosition = offset.left + parseInt($textarea.css('padding-left'));
+                var leftPosition = "70px";
+
+                // Position the popup over the textarea, just below the line where '/' was typed
+                $('#tag-popup').css({
+                    top: topPosition + lineHeight, // Position below the line
+                    left: leftPosition
+                }).show();
+            }
+
+            // Function to hide the tag popup
+            function hideTagPopup() {
+                $('#tag-popup').hide();
+                insertPosition = -1;
+                selectedTagIndex = -1;
+                $('#tag-list').empty(); // Clear the list to prevent duplication
+            }
+
+            // Function to update the selected item in the tag list
+            function updateTagSelection() {
+                var $items = $('#tag-list .list-group-item');
+                $items.removeClass('tag-active');
+                if (selectedTagIndex >= 0 && selectedTagIndex < $items.length) {
+                    var $selectedItem = $items.eq(selectedTagIndex);
+                    $selectedItem.addClass('tag-active');
+                    // Scroll into view if necessary
+                    var tagList = $('#tag-list');
+                    var itemTop = $selectedItem.position().top;
+                    var itemBottom = itemTop + $selectedItem.outerHeight();
+                    if (itemBottom > tagList.height()) {
+                        tagList.scrollTop(tagList.scrollTop() + itemBottom - tagList.height());
+                    } else if (itemTop < 0) {
+                        tagList.scrollTop(tagList.scrollTop() + itemTop);
+                    }
+                }
+            }
+
+            // Function to insert the selected tag at the correct position
+            function insertTagAtPosition(tag, position) {
+                var textarea = $('#lyric-input')[0];
+                var text = textarea.value;
+                // Replace the '/' at position with the tag
+                var before = text.substring(0, position);
+                var after = text.substring(position + 1); // Skip the '/'
+                var newText = before + tag + after;
+
+                var newCursorPos = position + tag.length;
+
+                textarea.value = newText;
+                textarea.selectionStart = textarea.selectionEnd = newCursorPos;
+                textarea.focus();
+
+                // Trigger input event to update highlighting and counters
+                $('#lyric-input').trigger('input');
+            }
+            // Hide the tag popup when clicking outside or pressing ESC
+            $(document).on('click', function(event) {
+                if (!$(event.target).closest('#tag-popup, #lyric-input').length) {
+                    hideTagPopup();
+                }
+            });
+
+            // Keydown event handler for keyboard navigation
+            $(document).on('keydown', function(event) {
+                if ($('#tag-popup').is(':visible')) {
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault(); // prevent cursor movement
+                        selectedTagIndex = (selectedTagIndex + 1) % tagOptions.length;
+                        updateTagSelection();
+                    } else if (event.key === 'ArrowUp') {
+                        event.preventDefault(); // prevent cursor movement
+                        selectedTagIndex = (selectedTagIndex - 1 + tagOptions.length) % tagOptions.length;
+                        updateTagSelection();
+                    } else if (event.key === 'Enter') {
+                        event.preventDefault(); // prevent form submission or new line
+                        if (selectedTagIndex >= 0 && selectedTagIndex < tagOptions.length) {
+                            var option = tagOptions[selectedTagIndex];
+                            insertTagAtPosition(option.tag, insertPosition);
+                            hideTagPopup();
+                        }
+                    } else if (event.key === 'Escape') {
+                        hideTagPopup();
+                    }
+                } else {
+                    if (event.key === 'Escape') {
+                        hideTagPopup();
+                    }
+                }
+            });
+
+            // Close button for the tag popup
+            $('#tag-popup-close').on('click', function() {
+                hideTagPopup();
+            });
+
+
             // Handle Cheat-sheet Modal
             $('#cheat-sheet-btn').click(function() {
                 $('#cheatSheetModal').modal('show');
+            });
+
+            // Handle Example Modal
+            $('#example-btn').click(function() {
+                $('#exampleModal').modal('show');
             });
 
             // Spell Check Toggle
@@ -588,9 +841,13 @@
 
             // Synchronize scroll positions
             function synchronizeScroll() {
-                var scrollTop = $('#lyric-input').scrollTop();
-                $('#highlighted-text').scrollTop(scrollTop);
-                $('#line-word-counts').scrollTop(scrollTop);
+                requestAnimationFrame(function() {
+                    var scrollTop = $('#lyric-input').scrollTop();
+                    var scrollLeft = $('#lyric-input').scrollLeft();
+                    $('#highlighted-text').scrollTop(scrollTop);
+                    $('#highlighted-text').scrollLeft(scrollLeft);
+                    $('#line-word-counts').scrollTop(scrollTop);
+                });
             }
 
             // Event listeners
@@ -672,9 +929,17 @@
                     if (word.endsWith(']') || word.endsWith(')')) {
                         inTag = false;
                     }
+
+                    displayText = displayText.replace(/\n$/, '\n&nbsp;');
                 }
 
                 $('#highlighted-text').html(displayText);
+
+                // Force repaint
+                $('#highlighted-text').css('transform', 'translateZ(0)');
+
+                // Synchronize scroll positions after updating content
+                synchronizeScroll();
             }
 
             // Update word and letter counters
