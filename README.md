@@ -1,11 +1,11 @@
 A small personal tool to help me write song lyrics, for Udio.com, and I thought someone else could maybe make use of it as well.
 It's made purely with HTML/CSS/JS, so you should be able to just open the index.html in any browser.
 
-Short 30 sec. demo:
-https://youtu.be/upaOqqYLmWo
+Short 60 sec. demo, how to install and use:
+https://youtu.be/M_p3Z_M2ZKA
 
 Screenshot:
-https://drive.google.com/file/d/1EVnS0oQsAdN0Rdwa0Hzky2vnlm0lvEU7/view?usp=sharing
+https://drive.google.com/file/d/1nKE1M1uzAVDDhyTLOvumftFxaihyQRB_/view?usp=sharing
 
 ----------
 
@@ -23,6 +23,7 @@ Duration and Tempo Settings:
 
 Cheat-Sheet:
 1. A handy reference for common tags and annotations used in songwriting.
+2. Type / to view a list of the official tags, much like on Udio.
 
 Rhyme Finder with Filtering:
 1. Enter a word to get a list of rhyming words based on matching ending letters.
