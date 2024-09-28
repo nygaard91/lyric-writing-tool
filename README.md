@@ -9,7 +9,7 @@ https://drive.google.com/file/d/1nKE1M1uzAVDDhyTLOvumftFxaihyQRB_/view?usp=shari
 
 ----------
 
-##Key Features:##
+## Key Features:
 
 **Writing Interface:**
 1. Real-time word and letter counter (excluding words within [] and ()), helping you keep track of your lyric length.
@@ -19,10 +19,10 @@ https://drive.google.com/file/d/1nKE1M1uzAVDDhyTLOvumftFxaihyQRB_/view?usp=shari
 2. Adjusts according to selected song duration and tempo to help visualize pacing.
 
 **Duration and Tempo Settings:**
-1.The tool adjusts word chunk sizes based on these settings, giving you an idea of how your lyrics fit within the song structure.
+1. The tool adjusts word chunk sizes based on these settings, giving you an idea of how your lyrics fit within the song structure.
 
 **Text-to-speech:**
-(Browser-based, options are dependent on the browser. I recommend using Edge, as it provides AI voices and supports many languages.)
+*(Browser-based, options are dependent on the browser. I recommend using Edge, as it provides AI voices and supports many languages.)*
 1. Select a language, voice, and tempo.
 2. Highlight text within the editor to read it. If nothing is selected, the full text will be read.
 
@@ -41,12 +41,12 @@ https://drive.google.com/file/d/1nKE1M1uzAVDDhyTLOvumftFxaihyQRB_/view?usp=shari
 
 ----------
 
-##Installation:##
+## Installation:
 Just download the folder and extract it to any location on your computer. No installation is required! Simply open the file named 'index.html' in your browser, and you're good to go. 
 The code is designed to run directly in the browser without the need for a local environment.
 
 ----------
 
-##Credit:##
+## Credit:
 The large list of 275k English words derived from the Letterpress word list.
 https://github.com/lorenbrichter/Words?tab=readme-ov-file
