@@ -5,7 +5,7 @@ It's made purely with HTML/CSS/JS, so you should be able to just open the index.
 https://youtu.be/M_p3Z_M2ZKA
 
 **Screenshot:**
-https://drive.google.com/file/d/1nKE1M1uzAVDDhyTLOvumftFxaihyQRB_/view?usp=sharing
+https://drive.google.com/file/d/1b70GHr_0lTWTRpMI2kDwqPnV3_DMQvO9/view?usp=sharing
 
 ----------
 
