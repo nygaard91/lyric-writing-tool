@@ -21,6 +21,10 @@ Word Highlighting:
 Duration and Tempo Settings:
 1.The tool adjusts word chunk sizes based on these settings, giving you an idea of how your lyrics fit within the song structure.
 
+Text-to-speech (Browser-based, options are dependent on the browser. I recommend using Edge, as it provides AI voices and supports many languages.)
+1. Select a language, voice, and tempo.
+2. Highlight text within the editor to read it. If nothing is selected, the full text will be read.
+
 Cheat-Sheet:
 1. A handy reference for common tags and annotations used in songwriting.
 2. Type / to view a list of the official tags, much like on Udio.
