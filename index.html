@@ -18,7 +18,7 @@
     .textarea-container {
         position: relative;
         height: calc(100vh - 150px); /* Adjust as needed */
-        min-height: 1130px;
+        min-height: 1650px;
         border: 1px solid #ccc;
         display: flex; /* Use flex to align items */
         overflow: hidden; /* Prevent double scrollbars */
@@ -237,14 +237,6 @@
                     </div>
                     <!-- Second Column: Settings -->
                     <div class="col-md-4">
-                        <!-- Save/Load Section -->
-                        <div>
-                            <button id="save-btn" class="btn btn-primary mb-2">Save</button>
-                            <button id="load-btn" class="btn btn-secondary mb-2 ml-2">Load</button>
-                            <!-- Hidden file input -->
-                            <input type="file" id="load-input" accept=".json" style="display: none;">
-                        </div>
-                        <div class="separator"></div>
                         <!-- Title and Prompt Inputs -->
                         <div>
                             <div class="form-group">
@@ -255,10 +247,51 @@
                                 <label for="prompt-input">Prompt</label>
                                 <input type="text" id="prompt-input" class="form-control" placeholder="Enter song prompt">
                             </div>
+                            <!-- Save/Load Section -->
+                            <div>
+                                <button id="save-btn" class="btn btn-primary mb-2">Save</button>
+                                <button id="load-btn" class="btn btn-secondary mb-2 ml-2">Load</button>
+                                <!-- Hidden file input -->
+                                <input type="file" id="load-input" accept=".json" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- Text-to-speech -->
+                        <div class="separator"></div>
+                        <h5 class="text-center" data-toggle="tooltip" data-placement="top" title="This tool convert text to speech using your selected language and voice options. The available voices may vary based on your browser; for the best experience, I recommend using Microsoft Edge.">Text-to-speech</h5>
+                        <div>
+                            <!-- Language Selection Dropdown -->
+                            <div class="form-group">
+                                <label for="languageSelect">Select Language</label>
+                                <select id="languageSelect" class="form-control"></select>
+                            </div>
+
+                            <!-- Voice Selection Dropdown -->
+                            <div class="form-group">
+                                <label for="voiceSelect">Select Voice</label>
+                                <select id="voiceSelect" class="form-control"></select>
+                            </div>
+
+                            <!-- Speech Rate Slider -->
+                            <div class="form-group">
+                                <label for="rateControl">Speech Rate (Tempo)</label>
+                                <input type="range" id="rateControl" class="form-control-range" min="0.1" max="2" step="0.1" value="1">
+                                <span id="rateValue">1.0</span>
+                            </div>
+
+                            <!-- Speak and Cancel Buttons -->
+                            <div class="form-group">
+                                <button class="btn btn-primary" onclick="speakText()">Speak</button>
+                                <button class="btn btn-danger" id="cancelButton" onclick="cancelSpeech()" disabled>Cancel</button>
+                            </div>
+
+                            <!-- Status Display -->
+                            <p id="status" class=""></p>
                         </div>
                         <div class="separator"></div>
+
                         <!-- Duration and Tempo -->
                         <div>
+                            <h5 class="text-center" data-toggle="tooltip" data-placement="top" title="This tool helps you gauge how much text can be sung, depending on the song's duration and tempo. Keep in mind that adding tags will impact how much fits into each section.">Chunk highlighting</h5>
                             <!-- Duration Dropdown -->
                             <div class="form-group">
                                 <label for="duration-select">Duration</label>
@@ -282,9 +315,33 @@
                             </div>
                         </div>
                         <div class="separator"></div>
-                        <!-- Cheat-sheet Button -->
+                        <!-- Rhyme Finder -->
                         <div>
-                            <button id="cheat-sheet-btn" class="btn btn-info mb-3">Cheat-sheet</button>
+                            <h5 class="text-center" data-toggle="tooltip" data-placement="top" title="A tool that helps you find words with similar endings.">Rhyme finder</h5>
+                            <div class="form-group">
+                                <label for="rhyme-input">Find Rhymes</label>
+                                <input type="text" id="rhyme-input" class="form-control" placeholder="Enter a word">
+                                <label for="ending-select" class="mt-2">Match ending letters:</label>
+                                <select id="ending-select" class="form-control">
+                                    <option value="2">2 letters</option>
+                                    <option value="3" selected>3 letters</option>
+                                    <option value="4">4 letters</option>
+                                    <option value="5">5 letters</option>
+                                </select>
+                                <button id="rhyme-btn" class="btn btn-secondary mt-2">Search</button>
+                                <div class="slider-container">
+                                    <label for="length-slider">Max Word Length: <span id="slider-value">0</span></label>
+                                    <input type="range" id="length-slider" class="form-control-range" min="1" max="1" value="1" disabled>
+                                </div>
+                                <div id="rhymes-list" class="mt-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+                        <!-- Libraries Buttons -->
+                        <div>
+                            <h5 class="text-center" data-toggle="tooltip" data-placement="top" title="This is a knowledge base where you can read more about how to use Udio. More to come soon.">Libraries</h5>
+                            <button id="cheat-sheet-btn" class="btn btn-info mb-3">Tags cheat-sheet</button>
                             <!-- Cheat Sheet Modal -->
                             <div class="modal fade" id="cheatSheetModal" tabindex="-1" role="dialog" aria-labelledby="cheatSheetModalLabel" aria-hidden="true">
                               <div class="modal-dialog modal-xl" role="document">
@@ -526,28 +583,6 @@
                               </div>
                             </div>
                         </div>
-
-                        <div class="separator"></div>
-                        <!-- Rhyme Finder -->
-                        <div>
-                            <div class="form-group">
-                                <label for="rhyme-input">Find Rhymes</label>
-                                <input type="text" id="rhyme-input" class="form-control" placeholder="Enter a word">
-                                <label for="ending-select" class="mt-2">Match ending letters:</label>
-                                <select id="ending-select" class="form-control">
-                                    <option value="2">2 letters</option>
-                                    <option value="3" selected>3 letters</option>
-                                    <option value="4">4 letters</option>
-                                    <option value="5">5 letters</option>
-                                </select>
-                                <button id="rhyme-btn" class="btn btn-secondary mt-2">Search</button>
-                                <div class="slider-container">
-                                    <label for="length-slider">Max Word Length: <span id="slider-value">0</span></label>
-                                    <input type="range" id="length-slider" class="form-control-range" min="1" max="1" value="1" disabled>
-                                </div>
-                                <div id="rhymes-list" class="mt-2"></div>
-                            </div>
-                        </div>
                     </div>
                 </div> <!-- End of row -->
             </div>
@@ -565,6 +600,162 @@
     <script src="blacklist.js"></script>
 
     <!-- JavaScript Code -->
+
+    <script>
+        let voices = [];
+        let selectedVoiceIndex = null; // Store the selected voice index
+
+        // Load voices into the dropdowns
+        function loadVoices() {
+            voices = speechSynthesis.getVoices();
+            const languageSelect = document.getElementById('languageSelect');
+            const voiceSelect = document.getElementById('voiceSelect');
+
+            const uniqueLanguages = Array.from(new Set(voices.map(voice => voice.lang)));
+
+            // Populate language dropdown
+            languageSelect.innerHTML = '';
+            uniqueLanguages.forEach(language => {
+                const option = document.createElement('option');
+                option.value = language;
+                option.textContent = language;
+                languageSelect.appendChild(option);
+            });
+
+            // Trigger voice list update when a language is selected
+            languageSelect.addEventListener('change', updateVoicesByLanguage);
+
+            // Update the voices dropdown based on initial language selection
+            updateVoicesByLanguage();
+        }
+
+        // Update voices based on selected language
+        function updateVoicesByLanguage() {
+            const languageSelect = document.getElementById('languageSelect');
+            const selectedLanguage = languageSelect.value;
+
+            const voiceSelect = document.getElementById('voiceSelect');
+
+            // Save the current selected voice index before updating the list
+            const previouslySelectedIndex = voiceSelect.selectedIndex;
+
+            voiceSelect.innerHTML = '';  // Clear previous options
+
+            const filteredVoices = voices.filter(voice => voice.lang === selectedLanguage);
+
+            filteredVoices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = voices.indexOf(voice); // Save the global index
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+
+            // Restore the selected option
+            if (previouslySelectedIndex !== -1 && previouslySelectedIndex < voiceSelect.options.length) {
+                voiceSelect.selectedIndex = previouslySelectedIndex;
+            } else if (filteredVoices.length > 0) {
+                // Default to the first voice if none is selected
+                voiceSelect.selectedIndex = 0;
+            }
+        }
+
+        // Ensure the voices are loaded when available
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+
+        // Function to get selected text or full text
+        function getSelectedText() {
+            const textarea = document.getElementById('lyric-input');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            // If there is selected text, return it; otherwise return full text
+            let text = start !== end ? textarea.value.substring(start, end) : textarea.value;
+
+            // Use regular expression to remove text within [] and ()
+            text = text.replace(/\[.*?\]|\(.*?\)/g, '');
+
+            return text;
+        }
+
+        // Function to update status message
+        function updateStatus(message, color = 'green') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.style.color = color;
+        }
+
+        // Update rate value display
+        document.getElementById('rateControl').addEventListener('input', function() {
+            document.getElementById('rateValue').textContent = this.value;
+        });
+
+        function speakText() {
+            // Stop any ongoing speech to prevent interruptions
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+
+            const text = getSelectedText();
+            if (text.trim() === '') return;  // Don't speak empty text
+
+            // Split text into chunks if necessary
+            const chunkSize = 200;  // Example chunk size
+            const chunks = text.match(new RegExp(`.{1,${chunkSize}}`, 'g'));
+
+            let chunkIndex = 0;
+
+            // Get the selected voice once and store its global index
+            const voiceSelect = document.getElementById('voiceSelect');
+            selectedVoiceIndex = voiceSelect.selectedIndex; // Store the current index
+            const selectedVoice = voices[voiceSelect.value];
+
+            function speakChunk() {
+                if (chunkIndex >= chunks.length) {
+                    updateStatus('Speech finished.', 'blue');
+                    document.getElementById('cancelButton').disabled = true;  // Disable cancel button
+                    return;
+                }
+
+                const utterance = new SpeechSynthesisUtterance(chunks[chunkIndex]);
+
+                // Explicitly set the selected voice each time
+                utterance.voice = selectedVoice;
+
+                // Set the speech rate based on the slider
+                const rateControl = document.getElementById('rateControl');
+                utterance.rate = rateControl.value;
+
+                // Handle events
+                utterance.onstart = function() {
+                    updateStatus('Speaking...', 'green');
+                    document.getElementById('cancelButton').disabled = false;  // Enable cancel button
+                };
+
+                utterance.onend = function () {
+                    chunkIndex++;
+                    speakChunk();  // Speak the next chunk
+                };
+
+                utterance.onerror = function(e) {
+                    updateStatus('Stopped: ' + e.error, 'red');
+                    document.getElementById('cancelButton').disabled = true;  // Disable cancel button
+                };
+
+                speechSynthesis.speak(utterance);
+            }
+
+            speakChunk();
+        }
+
+        function cancelSpeech() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                updateStatus('Speech canceled.', 'red');
+                document.getElementById('cancelButton').disabled = true;  // Disable cancel button
+            }
+        }
+    </script>
+
     <script>
         $(document).ready(function() {
 
@@ -602,6 +793,10 @@
 
             var selectedTagIndex = -1;
             var insertPosition = -1; // Position where '/' was typed
+
+
+            $('[data-toggle="tooltip"]').tooltip();
+
 
             // Event listener for keyup on '#lyric-input'
             $('#lyric-input').on('keyup', function(event) {
@@ -805,11 +1000,11 @@
                 var tempo = $('#tempo-select').val();
                 var suggestions = '';
                 if (tempo === 'slow') {
-                    suggestions = '<p>Prompt suggestions: Tempo 60 BPM, Ballads, Blues, Lo-Fi Hip-Hop, Downtempo, soulful melodies, emotional or introspective lyrics.</p>';
+                    suggestions = '<pre>Prompt suggestions: Tempo 60 BPM, Ballads, Blues, Lo-Fi Hip-Hop, Downtempo, soulful melodies, emotional or introspective lyrics.</pre>';
                 } else if (tempo === 'mid') {
-                    suggestions = '<p>Prompt suggestions: Tempo 100 BPM, Pop, Hip-Hop, Reggaeton, R&B, Funk, groovy rhythms, catchy hooks, storytelling, uplifting or reflective messages.</p>';
+                    suggestions = '<pre>Prompt suggestions: Tempo 100 BPM, Pop, Hip-Hop, Reggaeton, R&B, Funk, groovy rhythms, catchy hooks, storytelling, uplifting or reflective messages.</pre>';
                 } else if (tempo === 'fast') {
-                    suggestions = '<p>Prompt suggestions: Tempo 140 BPM, Rap, EDM, Drum and Bass, Punk Rock, Techno, fast-paced beats, energetic melodies, dance vibes, high-energy anthems.</p>';
+                    suggestions = '<pre>Prompt suggestions: Tempo 140 BPM, Rap, EDM, Drum and Bass, Punk Rock, Techno, fast-paced beats, energetic melodies, dance vibes, high-energy anthems.</pre>';
                 }
                 $('#suggestions').html(suggestions);
             }
