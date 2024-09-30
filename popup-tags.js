@@ -1,0 +1,32 @@
+// popup-tags.js
+
+var tagOptions = [
+    { tag: '[Verse]', description: 'Main narrative section of a song' },
+    { tag: '[Chorus]', description: 'Repetitive, catchy section that often contains the song\'s hook' },
+    { tag: '[Intro]', description: 'Opening section that sets the tone of the song' },
+    { tag: '[Outro]', description: 'Closing section that brings the song to an end' },
+    { tag: '[Bridge]', description: 'Contrasting section that connects two main parts of a song' },
+    { tag: '[Hook]', description: 'Catchy phrase or riff designed to grab the listener\'s attention' },
+    { tag: '[Pre-chorus]', description: 'Section that builds tension before the chorus' },
+    { tag: '[Refrain]', description: 'Repeated lyrical phrase or musical idea' },
+    { tag: '[Post-chorus]', description: 'Section that follows and extends the chorus' },
+    { tag: '[Drop]', description: 'Moment of musical climax, often in electronic dance music' },
+    { tag: '[Interlude]', description: 'Instrumental passage between other sections' },
+    { tag: '[Instrumental Break]', description: 'Section without vocals, showcasing instruments' },
+    { tag: '[Instrumental]', description: 'Piece or section of music without vocals' },
+    { tag: '[Build]', description: 'Gradual increase in intensity or complexity' },
+    { tag: '[Pre-hook]', description: 'Section that leads into the hook' },
+    { tag: '[Pre-drop]', description: 'Build-up section before the drop in electronic music' },
+    { tag: '[Pre-refrain]', description: 'Section leading into the refrain' },
+    { tag: '[Break]', description: 'Brief pause or change in the rhythm or melody' },
+    { tag: '[All]', description: 'Indicates all instruments or voices playing together' },
+    { tag: '[Breakdown]', description: 'Stripped-down section that contrasts with fuller sections' },
+    { tag: '[Instrumental Bridge]', description: 'Bridge section without vocals' },
+    { tag: '[Sample]', description: 'Use of a portion of another sound recording' },
+    { tag: '[Solo]', description: 'Section featuring a single instrument or voice' },
+    { tag: '[Ensemble]', description: 'Section featuring multiple instruments or voices together' },
+    { tag: '[Post-hook]', description: 'Section that follows and extends the hook' },
+    { tag: '[Spoken Word]', description: 'Poetic or prose section that is spoken rather than sung' },
+    { tag: '[Choir]', description: 'Section featuring a group of singers' },
+    { tag: '[Announcer]', description: 'Spoken introduction or commentary, often in live recordings' }
+];

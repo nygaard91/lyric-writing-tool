@@ -599,8 +599,12 @@
     <!-- Include the blacklist script -->
     <script src="blacklist.js"></script>
 
+    <!-- Include the tags for pop-up -->
+    <script src="popup-tags.js"></script>
+
     <!-- JavaScript Code -->
 
+    <!-- Text-to-speech -->
     <script>
         let voices = [];
         let selectedVoiceIndex = null; // Store the selected voice index
@@ -756,46 +760,13 @@
         }
     </script>
 
+    <!-- Tags pop-up -->
     <script>
         $(document).ready(function() {
 
-            var tagOptions = [
-                { tag: '[Verse]', description: 'Main narrative section of a song' },
-                { tag: '[Chorus]', description: 'Repetitive, catchy section that often contains the song\'s hook' },
-                { tag: '[Intro]', description: 'Opening section that sets the tone of the song' },
-                { tag: '[Outro]', description: 'Closing section that brings the song to an end' },
-                { tag: '[Bridge]', description: 'Contrasting section that connects two main parts of a song' },
-                { tag: '[Hook]', description: 'Catchy phrase or riff designed to grab the listener\'s attention' },
-                { tag: '[Pre-chorus]', description: 'Section that builds tension before the chorus' },
-                { tag: '[Refrain]', description: 'Repeated lyrical phrase or musical idea' },
-                { tag: '[Post-chorus]', description: 'Section that follows and extends the chorus' },
-                { tag: '[Drop]', description: 'Moment of musical climax, often in electronic dance music' },
-                { tag: '[Interlude]', description: 'Instrumental passage between other sections' },
-                { tag: '[Instrumental Break]', description: 'Section without vocals, showcasing instruments' },
-                { tag: '[Instrumental]', description: 'Piece or section of music without vocals' },
-                { tag: '[Build]', description: 'Gradual increase in intensity or complexity' },
-                { tag: '[Pre-hook]', description: 'Section that leads into the hook' },
-                { tag: '[Pre-drop]', description: 'Build-up section before the drop in electronic music' },
-                { tag: '[Pre-refrain]', description: 'Section leading into the refrain' },
-                { tag: '[Break]', description: 'Brief pause or change in the rhythm or melody' },
-                { tag: '[All]', description: 'Indicates all instruments or voices playing together' },
-                { tag: '[Breakdown]', description: 'Stripped-down section that contrasts with fuller sections' },
-                { tag: '[Instrumental Bridge]', description: 'Bridge section without vocals' },
-                { tag: '[Sample]', description: 'Use of a portion of another sound recording' },
-                { tag: '[Solo]', description: 'Section featuring a single instrument or voice' },
-                { tag: '[Ensemble]', description: 'Section featuring multiple instruments or voices together' },
-                { tag: '[Post-hook]', description: 'Section that follows and extends the hook' },
-                { tag: '[Spoken Word]', description: 'Poetic or prose section that is spoken rather than sung' },
-                { tag: '[Choir]', description: 'Section featuring a group of singers' },
-                { tag: '[Announcer]', description: 'Spoken introduction or commentary, often in live recordings' }
-            ];
-
-
             var selectedTagIndex = -1;
             var insertPosition = -1; // Position where '/' was typed
-
-
-            $('[data-toggle="tooltip"]').tooltip();
+            var filteredTagOptions = [];
 
 
             // Event listener for keyup on '#lyric-input'
@@ -807,45 +778,60 @@
                 var textarea = $(this)[0];
                 var position = textarea.selectionStart;
                 var text = textarea.value;
-                // Check if the character before the cursor is '/'
-                if (text.substring(position - 1, position) === '/') {
-                    showTagPopup(position - 1);
+
+                // Search backwards from the cursor for the last '/'
+                var slashPosition = text.lastIndexOf('/', position - 1);
+                if (slashPosition >= 0) {
+                    // Get the filter text
+                    var filterText = text.substring(slashPosition + 1, position);
+                    showTagPopup(slashPosition, filterText);
                 } else {
                     hideTagPopup();
                 }
             });
+
 
             // Close button for the tag popup
             $('#tag-popup-close').on('click', function() {
                 hideTagPopup();
             });
 
-             // Function to show the tag selection popup
-            function showTagPopup(position) {
-                // Only populate the tag list if it's not already populated
-                if ($('#tag-list').children().length === 0) {
-                    // Populate the tag list
-                    var $tagList = $('#tag-list');
-                    $tagList.empty();
-                    tagOptions.forEach(function(option, index) {
-                        var $item = $('<li class="list-group-item list-group-item-action"></li>');
-                        $item.html('<strong>' + option.tag + '</strong><br><small>' + option.description + '</small>');
-                        $item.on('click', function() {
-                            insertTagAtPosition(option.tag, position);
-                            hideTagPopup();
-                        });
-                        $item.on('mouseenter', function() {
-                            // Update selectedTagIndex
-                            selectedTagIndex = index;
-                            updateTagSelection();
-                        });
-                        $tagList.append($item);
-                    });
+            // Function to show the tag selection popup
+            function showTagPopup(position, filterText) {
+                // Filter the tagOptions based on filterText
+                filteredTagOptions = tagOptions.filter(function(option) {
+                    return option.tag.toLowerCase().includes(filterText.toLowerCase());
+                });
+
+                // If no options, hide the popup
+                if (filteredTagOptions.length === 0) {
+                    hideTagPopup();
+                    return;
                 }
 
-                selectedTagIndex = selectedTagIndex >= 0 ? selectedTagIndex : 0; // Initialize selected index
+                // Populate the tag list
+                var $tagList = $('#tag-list');
+                $tagList.empty();
+                filteredTagOptions.forEach(function(option, index) {
+                    var $item = $('<li class="list-group-item list-group-item-action"></li>');
+                    $item.html('<strong>' + option.tag + '</strong><br><small>' + option.description + '</small>');
+                    $item.on('click', function() {
+                        var textarea = $('#lyric-input')[0];
+                        var cursorPosition = textarea.selectionStart;
+                        insertTagAtPosition(option.tag, position, cursorPosition);
+                        hideTagPopup();
+                    });
+                    $item.on('mouseenter', function() {
+                        // Update selectedTagIndex
+                        selectedTagIndex = index;
+                        updateTagSelection();
+                    });
+                    $tagList.append($item);
+                });
+
+                selectedTagIndex = 0; // Initialize selected index
                 updateTagSelection(); // Update the highlighting
-                insertPosition = position; // Store the position for later use
+                insertPosition = position; // Store the position of '/'
 
                 // Position the tag-popup
                 var $textarea = $('#lyric-input');
@@ -877,7 +863,6 @@
                 var topPosition = paddingTop + (lineNumber * lineHeight) - $textarea.scrollTop();
 
                 // Adjust left position to align with the left edge of the textarea
-                //var leftPosition = offset.left + parseInt($textarea.css('padding-left'));
                 var leftPosition = "70px";
 
                 // Position the popup over the textarea, just below the line where '/' was typed
@@ -893,6 +878,7 @@
                 insertPosition = -1;
                 selectedTagIndex = -1;
                 $('#tag-list').empty(); // Clear the list to prevent duplication
+                filteredTagOptions = [];
             }
 
             // Function to update the selected item in the tag list
@@ -915,15 +901,15 @@
             }
 
             // Function to insert the selected tag at the correct position
-            function insertTagAtPosition(tag, position) {
+            function insertTagAtPosition(tag, startPosition, endPosition) {
                 var textarea = $('#lyric-input')[0];
                 var text = textarea.value;
-                // Replace the '/' at position with the tag
-                var before = text.substring(0, position);
-                var after = text.substring(position + 1); // Skip the '/'
+                // Replace the text from startPosition to endPosition with the tag
+                var before = text.substring(0, startPosition);
+                var after = text.substring(endPosition);
                 var newText = before + tag + after;
 
-                var newCursorPos = position + tag.length;
+                var newCursorPos = startPosition + tag.length;
 
                 textarea.value = newText;
                 textarea.selectionStart = textarea.selectionEnd = newCursorPos;
@@ -932,6 +918,7 @@
                 // Trigger input event to update highlighting and counters
                 $('#lyric-input').trigger('input');
             }
+
             // Hide the tag popup when clicking outside or pressing ESC
             $(document).on('click', function(event) {
                 if (!$(event.target).closest('#tag-popup, #lyric-input').length) {
@@ -944,17 +931,19 @@
                 if ($('#tag-popup').is(':visible')) {
                     if (event.key === 'ArrowDown') {
                         event.preventDefault(); // prevent cursor movement
-                        selectedTagIndex = (selectedTagIndex + 1) % tagOptions.length;
+                        selectedTagIndex = (selectedTagIndex + 1) % filteredTagOptions.length;
                         updateTagSelection();
                     } else if (event.key === 'ArrowUp') {
                         event.preventDefault(); // prevent cursor movement
-                        selectedTagIndex = (selectedTagIndex - 1 + tagOptions.length) % tagOptions.length;
+                        selectedTagIndex = (selectedTagIndex - 1 + filteredTagOptions.length) % filteredTagOptions.length;
                         updateTagSelection();
                     } else if (event.key === 'Enter') {
                         event.preventDefault(); // prevent form submission or new line
-                        if (selectedTagIndex >= 0 && selectedTagIndex < tagOptions.length) {
-                            var option = tagOptions[selectedTagIndex];
-                            insertTagAtPosition(option.tag, insertPosition);
+                        if (selectedTagIndex >= 0 && selectedTagIndex < filteredTagOptions.length) {
+                            var option = filteredTagOptions[selectedTagIndex];
+                            var textarea = $('#lyric-input')[0];
+                            var cursorPosition = textarea.selectionStart;
+                            insertTagAtPosition(option.tag, insertPosition, cursorPosition);
                             hideTagPopup();
                         }
                     } else if (event.key === 'Escape') {
@@ -967,10 +956,17 @@
                 }
             });
 
-            // Close button for the tag popup
+            // Close button for the tag popup (if you have one)
             $('#tag-popup-close').on('click', function() {
                 hideTagPopup();
             });
+        });
+    </script>
+
+    <!-- General JavaScript -->
+    <script>
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"]').tooltip();
 
 
             // Handle Cheat-sheet Modal
@@ -1362,7 +1358,6 @@
                 $('#slider-value').text(maxLength);
                 displayRhymes(currentRhymes, maxLength);
             });
-
         });
     </script>
 </body>
